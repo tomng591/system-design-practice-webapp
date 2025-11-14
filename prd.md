@@ -31,6 +31,91 @@
 # MVP Focus
 **Learning Module Only**: This MVP focuses exclusively on the learning feature with traditional reading, Q&A, and quizzes. Voice-based practice and mock interviews are planned for future milestones after initial learning system is validated.
 
+# Architecture & Scalability Strategy
+
+## Current Architecture (MVP - Milestones 1-2)
+The MVP is a **monolithic Next.js application** where all code (frontend and business logic) runs in a single repository:
+- Frontend: React components in `/app` and `/components`
+- Business Logic: Pure functions in `/lib` (e.g., `llm-client.ts`, `chat.ts`)
+- API calls: Made directly to LLM providers from Next.js
+- Data Storage: Client-side IndexedDB for user data (Milestone 2+)
+
+**Why this approach:**
+- Faster MVP development
+- Simpler deployment
+- Sufficient for early-stage user validation
+- No unnecessary infrastructure complexity
+
+## Future Architecture (Milestone 3+): Backend Separation
+As the app grows and complexity increases (Milestone 3: roadmap generation, Milestone 4: lesson evaluation, Milestone 5: material processing), we plan to separate business logic into a dedicated Node.js backend server.
+
+**Separation Path:**
+```
+MVP (All in Next.js):
+React Components → /lib/business-logic.ts → LLM APIs
+
+Future (Separate Backend):
+React Components → /app/api/routes → HTTP → Separate Node.js Backend → LLM APIs
+```
+
+**Migration Effort Estimate:**
+- Extracting logic to separate backend: 1-2 weeks
+- Database migration (IndexedDB → backend DB): 1-2 weeks
+- Infrastructure setup & deployment: 1 week
+- **Total: 3-5 weeks** (can be done incrementally)
+
+## Design Principles for Easy Future Migration
+
+To ensure separation is straightforward when needed, follow these guidelines during implementation:
+
+### ✅ DO:
+1. **Keep business logic in `/lib` as pure functions**
+   - No React dependencies (useState, useContext, hooks)
+   - Accept inputs, return structured outputs
+   - Example: `callLLM(provider, message) → { content, provider }`
+
+2. **Define clear API contracts**
+   - Document data structures that flow between frontend and backend
+   - Create Next.js API routes (`/app/api/*`) as interface layer early (Milestone 2+)
+   - This makes swapping backend implementation trivial later
+
+3. **Store sensitive data server-side only**
+   - API keys, secrets, and credentials never in client code
+   - Pass only responses to client, never raw API keys
+   - Use environment variables in `.env.local`
+
+4. **Use dependency injection patterns**
+   - Pass dependencies (like LLM client) as function parameters
+   - Makes testing and backend swapping easier
+
+### ❌ DON'T:
+1. **Tightly couple business logic to React**
+   - Avoid embedding business logic in component files
+   - Don't use React hooks within business logic functions
+
+2. **Mix UI and business logic**
+   - Keep presentation layer separate from data/business layer
+   - UI should only call functions from `/lib`, not contain business logic
+
+3. **Use client-side environment variables for secrets**
+   - Even if Next.js allows it, only use `NEXT_PUBLIC_*` for non-sensitive values
+   - Keep API keys server-side
+
+4. **Create tight dependencies between components**
+   - Use props and prop drilling rather than global state for simple cases
+   - Easier to extract components to backend services later
+
+## When to Actually Separate
+
+**Trigger points for backend migration:**
+- When Milestone 3 (roadmap generation) complexity requires heavy computation
+- When Milestone 5 (material processing, web search) needs long-running operations
+- When you need background jobs (processing materials, generating lessons asynchronously)
+- When you want to scale LLM calls independently from UI
+- When you need a traditional database for complex queries (not just IndexedDB)
+
+**Do NOT separate prematurely** - MVP benefits from simplicity. Wait until you have real scalability needs.
+
 # Milestones & tasks
 ## Milestone 1: Set up webapp project and multi-LLM support
 - Initialize web app project (Next.js/React)
