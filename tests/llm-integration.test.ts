@@ -8,7 +8,7 @@ describe('ai-sdk Integration', () => {
   });
 
   it('getModel should return model object for valid provider/model', () => {
-    const model = getModel('openai', 'gpt-4');
+    const model = getModel('openai', 'gpt-4.1');
     expect(model).toBeDefined();
     expect(model).not.toBeNull();
   });
@@ -23,18 +23,18 @@ describe('ai-sdk Integration', () => {
     expect(model).toBeUndefined();
   });
 
-  it('should have gpt-4 model available from OpenAI', () => {
-    const model = getModel('openai', 'gpt-4');
+  it('should have gpt-4.1 model available from OpenAI', () => {
+    const model = getModel('openai', 'gpt-4.1');
     expect(model).toBeDefined();
   });
 
-  it('should have claude-3-opus model available from Anthropic', () => {
-    const model = getModel('anthropic', 'claude-3-opus');
+  it('should have claude-sonnet-4.5 model available from Anthropic', () => {
+    const model = getModel('anthropic', 'claude-sonnet-4.5');
     expect(model).toBeDefined();
   });
 
-  it('should have gemini-pro model available from Google', () => {
-    const model = getModel('google', 'gemini-pro');
+  it('should have gemini-2.5-pro model available from Google', () => {
+    const model = getModel('google', 'gemini-2.5-pro');
     expect(model).toBeDefined();
   });
 });

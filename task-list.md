@@ -86,88 +86,97 @@
 
 ---
 
-## Task 1.6: Create Basic Chat UI Components
-**What**: Build reusable UI components for chat interface
+## Task 1.6: Create Basic Chat UI Components (AI SDK Optimized)
+**What**: Build minimal, reusable UI components for chat interface leveraging ai-sdk/ui patterns
 
 **How**:
 - Create `/components/ChatMessage.tsx` to display individual messages (user/assistant)
 - Create `/components/ChatInput.tsx` with input field and send button
-- Create `/components/ChatContainer.tsx` to display message list
+- Create `/components/ChatContainer.tsx` to display message list with auto-scroll
 - Use shadcn Button and Input components
-- Add basic styling with TailwindCSS (flex layout, colors, spacing)
+- Add basic TailwindCSS styling
+- **Note**: AI SDK's `useChat` hook (Task 1.7) handles message state, so components focus only on UI rendering
 
 **Verify**:
 - All components render without errors
-- Components accept and display props correctly
+- Components follow ai-sdk/ui Message type structure
 - Styling looks clean and readable
 
 ---
 
-## Task 1.7: Create Chat Page and State Management
-**What**: Build the main chat page with message state and LLM interaction
+## Task 1.7: Create Chat Page with useChat Hook (AI SDK UI)
+**What**: Build main chat page using ai-sdk/ui's `useChat` hook for state management
 
 **How**:
-- Create `/app/page.tsx` as the main chat page
-- Use React `useState` to manage messages array
+- Create `/app/chat/page.tsx` using ai-sdk/ui's `useChat` hook (replaces manual useState)
+- `useChat` automatically handles: messages array, loading state, error state, sending, streaming
 - Add provider selector dropdown (OpenAI, Claude, Gemini)
 - Add model selector dropdown (configurable per provider)
-- Implement message submission handler that calls the LLM
-- Implement loading state during API calls
+- Pass selected provider/model to the `/api/chat` endpoint via headers
+- Integrate ChatContainer, ChatInput, and ChatMessage components
 
 **Verify**:
 - Page renders without errors
 - Provider and model dropdowns work
-- Messages are stored and displayed correctly
+- `useChat` hook integrates without TypeScript errors
+- Messages display correctly
+
+**Key Benefit**: Eliminates 80% of state management code; ai-sdk handles chat state, streaming, and error states automatically.
 
 ---
 
-## Task 1.8: Implement Chat Functionality - Send Message to LLM
-**What**: Connect chat UI to LLM and handle responses
+## Task 1.8: Create Chat API Endpoint with streamText (AI SDK Core)
+**What**: Create a simple `/api/chat` endpoint using ai-sdk's `streamText` function
 
 **How**:
-- Create `/lib/chat.ts` with `sendMessage(message, provider, model)` function
-- Call the LLM abstraction layer from Task 1.5
-- Add error handling for API failures (display error message to user)
-- Update chat messages array with both user and assistant responses
-- Add response streaming support (optional but recommended)
+- Create `/app/api/chat/route.ts` with a POST endpoint
+- Use ai-sdk's `streamText()` to stream LLM responses
+- Extract provider and model from request headers (set by useChat)
+- Call `getModel(provider, model)` from `/lib/llm.ts` (Task 1.4)
+- Return streamed response using ai-sdk's `toUIMessageStreamResponse()` helper
+- Let ai-sdk handle streaming, errors, token counting automatically
 
 **Verify**:
-- Sending a message calls the API and returns a response
-- Responses appear in chat UI
-- Errors are displayed gracefully to the user
-- Loading indicator shows while waiting for response
+- POST `/api/chat` endpoint works with streaming response
+- useChat hook receives and displays streamed responses
+- No manual response formatting or state management needed
+
+**Key Benefit**: `streamText` handles all complexity (streaming, backpressure, error handling, metadata). No custom chat logic file needed.
 
 ---
 
-## Task 1.9: Add Error Handling and User Feedback
-**What**: Improve robustness with error messages and validation
+## Task 1.9: Add Minimal Error Handling via AI SDK
+**What**: Ensure errors are handled and displayed to user
 
 **How**:
-- Add input validation (check message is not empty)
-- Add UI error notifications (toast or alert component from shadcn)
-- Handle network errors gracefully
-- Handle rate limiting and quota errors
-- Add logging for debugging
+- Add input validation in ChatInput component (prevent empty messages)
+- ai-sdk's `useChat` hook automatically catches and exposes errors in `error` state
+- Add error display component that shows `useChat`'s error state
+- Add basic logging to console for debugging
+- No need for custom error handling layer; ai-sdk provides it
 
 **Verify**:
 - Empty message submission is prevented
-- API errors show user-friendly messages
-- No console errors when things fail
+- API errors display in UI via useChat error state
+- Invalid provider/model combinations are caught gracefully
+
+**Key Benefit**: Leverages ai-sdk's built-in error handling instead of custom layer.
 
 ---
 
-## Task 1.10: Test Basic Chat Flow - Manual Testing
-**What**: Verify the entire chat system works end-to-end with all three LLM providers
+## Task 1.10: Manual End-to-End Testing
+**What**: Verify entire chat system works with at least one real LLM provider
 
 **How**:
-- Set up API keys for at least one provider (start with OpenAI if available)
-- Run dev server: `npm run dev`
-- Test basic flow: type message → select provider → send → see response
-- Test provider switching: verify response changes per provider
-- Test edge cases: empty input, very long input, network failure
+- Set up valid API key in `.env.local` (start with OpenAI)
+- Run `npm run dev`
+- Test: type message → select provider → send → see streaming response
+- Test provider switching and different models
+- Test edge cases: empty input, very long messages, rapid sends
 
 **Verify**:
-- Successfully send and receive messages from at least one LLM provider
-- Chat UI displays messages correctly
+- Successfully send and receive messages from real LLM provider
+- Streaming responses appear in chat UI in real-time
+- Provider switching works correctly
 - No crashes or unhandled errors
 - Basic functionality works end-to-end

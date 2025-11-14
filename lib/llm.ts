@@ -4,16 +4,19 @@ import { google } from '@ai-sdk/google';
 
 export const llmModels = {
   openai: {
-    'gpt-4': openai('gpt-4'),
-    'gpt-3.5-turbo': openai('gpt-3.5-turbo'),
+    'gpt-4.1': openai('gpt-4.1-2025-04-14'),
+    'gpt-4.1-mini': openai('gpt-4.1-mini-2025-04-14'),
+    'gpt-4o': openai('gpt-4o-2024-11-20'),
   },
   anthropic: {
-    'claude-3-opus': anthropic('claude-3-opus-20240229'),
-    'claude-3-sonnet': anthropic('claude-3-sonnet-20240229'),
+    'claude-sonnet-4.5': anthropic('claude-sonnet-4-5-20250929'),
+    'claude-haiku-4.5': anthropic('claude-haiku-4-5-20251001'),
+    'claude-opus-4.1': anthropic('claude-opus-4-1-20250805'),
   },
   google: {
-    'gemini-pro': google('gemini-pro'),
-    'gemini-1.5-pro': google('gemini-1.5-pro'),
+    'gemini-2.5-pro': google('gemini-2.5-pro'),
+    'gemini-2.5-flash': google('gemini-2.5-flash'),
+    'gemini-2.5-flash-lite': google('gemini-2.5-flash-lite'),
   },
 };
 
